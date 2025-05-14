@@ -30,6 +30,9 @@ module.exports = {
   },
   ignorePatterns: ['.eslintrc.js'],
   rules: {
+    rules: {
+      'max-len': ['error', { code: 120 }],
+    },
     'no-underscore-dangle': ['error', { allow: ['_id'] }],
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     'linebreak-style': ['error', 'windows'],
@@ -44,7 +47,13 @@ module.exports = {
     'no-nested-ternary': 'error',
     'max-params': ['warn', 4],
     complexity: ['warn', 6],
-    'no-confusing-arrow': ['error', { allowParens: true, onlyOneSimpleParam: false }],
+    'no-confusing-arrow': [
+      'error',
+      {
+        allowParens: true,
+        onlyOneSimpleParam: false,
+      },
+    ],
     'import/extensions': [
       'error',
       'ignorePackages',
