@@ -1,0 +1,23 @@
+{
+  "version": "0.2",
+  "language": "en-US",
+  "words": [],
+  "ignoreWords": [
+    "menora",
+    "nestjs",
+    "dockerhub",
+    "INITDB",
+    "myroot",
+    "prepush",
+    "en_US",
+    ".eslintrc.js",
+    "commitlint",
+    "jest",
+    "rediss",
+    "prestart"
+  ],
+  "dictionaries": ["en_US"],
+  "enabledLanguageIds": ["en"],
+  "ignoreRegExpList": [],
+  "ignorePaths": ["node_modules/**", "dist/**", "k8s/**", ".eslintrc.js", "./eslintrc.js", ".\\.eslintrc.js"]
+}

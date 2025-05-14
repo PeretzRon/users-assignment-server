@@ -1,0 +1,4 @@
+{
+  "**/*.{ts,yml,json,yaml,js}": ["cspell lint --no-must-find-files", "prettier --write"],
+  "**/*.{ts,yml,yaml,js}": ["eslint --fix"]
+}

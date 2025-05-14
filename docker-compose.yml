@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  mongodb:
+    image: mongo:7.0
+    environment:
+      MONGO_INITDB_DATABASE: users-app
+    ports:
+      - "27020:27017"
+    volumes:
+      - ./docker-scripts/init-mongo-db-with-collections.js:/docker-entrypoint-initdb.d/init-mongo-db-with-collections.js:ro
+
+volumes:
+  mongodb_data:
