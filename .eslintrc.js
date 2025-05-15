@@ -30,6 +30,7 @@ module.exports = {
   },
   ignorePatterns: ['.eslintrc.js'],
   rules: {
+    indent: ['error', 2, { ignoredNodes: ['PropertyDefinition'] }],
     'no-underscore-dangle': ['error', { allow: ['_id'] }],
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     'linebreak-style': ['error', 'windows'],

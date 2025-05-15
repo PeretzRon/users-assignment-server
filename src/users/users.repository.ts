@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { DbService } from '../db/db.service';
 import { User } from '../shared/dtos/users/users.dto';
+import { CreateUserDto } from '../shared/dtos/users/create-user.dto';
 import { UserResponseDto } from '../shared/dtos/users/user-response.dto';
 
 @Injectable()
@@ -14,5 +15,14 @@ export class UsersRepository {
 
   async getAll(): Promise<UserResponseDto[]> {
     return (await this.collection.find({}).project({ _id: 0 }).toArray()) as UserResponseDto[];
+  }
+
+  async create(user: CreateUserDto): Promise<UserResponseDto> {
+    const newUser = {
+      uuid: crypto.randomUUID(),
+      ...user,
+    };
+    await this.collection.insertOne({ ...newUser });
+    return newUser;
   }
 }
