@@ -33,6 +33,8 @@ describe('UsersController (e2e)', () => {
     mongoClient = new MongoClient(uri);
     await mongoClient.connect();
     db = mongoClient.db('users-app');
+    db.createCollection('users');
+    db.collection('users').createIndex({ email: 1 }, { unique: true });
 
     jest.spyOn(Logger.prototype, 'log').mockImplementation(() => {});
     jest.spyOn(Logger.prototype, 'error').mockImplementation(() => {});
@@ -103,6 +105,19 @@ describe('UsersController (e2e)', () => {
       request(app.getHttpServer()).post('/users').send(bodyWithoutLastName).expect(400),
       request(app.getHttpServer()).post('/users').send(bodyWithMinPasswordLength).expect(400),
     ]);
+  });
+
+  it('/users (POST) - should fail to create a user with duplicate email and return 409 Conflict', async () => {
+    const body: CreateUserDto = {
+      firstName: 'Test',
+      lastName: 'Test',
+      email: 'duplicate@g.com',
+      password: '123456',
+    };
+
+    await request(app.getHttpServer()).post('/users').send(body).expect(201);
+    await delay(300);
+    await request(app.getHttpServer()).post('/users').send(body).expect(409);
   });
 
   it('/users/:uuid (DELETE) - should delete a user successfully', async () => {

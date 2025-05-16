@@ -1,5 +1,5 @@
 import { ConfigService } from '@nestjs/config';
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 
 import { QueueService } from '../queue/queue.service';
 
@@ -33,6 +33,13 @@ export class RetryService {
     try {
       return await fn();
     } catch (error) {
+      if (
+        error instanceof ConflictException ||
+        error instanceof BadRequestException ||
+        error instanceof NotFoundException
+      ) {
+        throw error;
+      }
       const message = error instanceof Error ? error.message : String(error);
       this.logger.warn(`Attempt ${attempt}/${maxRetries} failed: ${message}`);
 

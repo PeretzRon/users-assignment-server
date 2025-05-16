@@ -74,7 +74,10 @@ export class UsersController {
       return result;
     } catch (error) {
       this.logger.error('Error creating user', error.stack);
-      throw new HttpException('Failed to create user', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        `Failed to create user: ${error.message}`,
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 

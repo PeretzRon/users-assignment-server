@@ -9,7 +9,7 @@ import { UserResponseDto } from '../shared/dtos/users/user-response.dto';
 
 @Injectable()
 export class UsersService {
-  private readonly RETRIES = 10;
+  private readonly RETRIES = 3;
 
   private readonly DELAY_MS = 500;
 

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 
 import { DbService } from '../db/db.service';
 import { User } from '../shared/dtos/users/users.dto';
@@ -22,8 +22,16 @@ export class UsersRepository {
       uuid: crypto.randomUUID(),
       ...user,
     };
-    await this.collection.insertOne({ ...newUser });
-    return newUser;
+
+    try {
+      await this.collection.insertOne(newUser);
+      return newUser;
+    } catch (error: any) {
+      if (error?.code === 11000) {
+        throw new ConflictException('Email already exists');
+      }
+      throw error;
+    }
   }
 
   async delete(uuid: string): Promise<boolean> {
