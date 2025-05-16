@@ -43,7 +43,7 @@ export class UsersController {
   @Post()
   @UsePipes(new ValidationPipe())
   async create(@Body() body: CreateUserDto) {
-    this.logger.log(`Creating a new user: ${JSON.stringify(body)}`);
+    this.logger.log(`Creating a new user: ${JSON.stringify((({ password: _password, ...rest }) => rest)(body))}`);
     try {
       const result = await this.service.create(body);
       this.logger.log(`user created successfully, result: ${JSON.stringify(result)}`);
