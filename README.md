@@ -19,7 +19,7 @@ npm install
 ### 3. Run Docker Compose
 
 ```aiignore
-docker-compose up
+docker-compose up -d
 ```
 
 ### 4. Start the Application
