@@ -1,10 +1,12 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpException,
   HttpStatus,
   Logger,
+  Param,
   Post,
   UsePipes,
   ValidationPipe,
@@ -13,6 +15,7 @@ import {
 import { UsersService } from './users.service';
 import { Routes } from '../shared/constants/routes.const';
 import { CreateUserDto } from '../shared/dtos/users/create-user.dto';
+import { DeleteUserDto } from '../shared/dtos/users/delete-user.dto';
 import { UserResponseDto } from '../shared/dtos/users/user-response.dto';
 
 @Controller({
@@ -48,6 +51,23 @@ export class UsersController {
     } catch (error) {
       this.logger.error('Error creating user', error.stack);
       throw new HttpException('Failed to create user', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @Delete(':uuid')
+  @UsePipes(new ValidationPipe())
+  async delete(@Param() params: DeleteUserDto) {
+    this.logger.log(`Start deleting user with id: ${params.uuid}`);
+    try {
+      const result = await this.service.delete(params.uuid);
+      this.logger.log(`User with id: ${params.uuid} deleted successfully`);
+      return { deleted: result };
+    } catch (error) {
+      this.logger.error(`Error deleting user with id: ${params.uuid}`, error.stack);
+      throw new HttpException(
+        `Failed to delete user: ${error.message}`,
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }

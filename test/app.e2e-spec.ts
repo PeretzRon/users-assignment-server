@@ -1,9 +1,10 @@
 import * as request from 'supertest';
 import { Db, MongoClient } from 'mongodb';
-import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { MongoMemoryServer } from 'mongodb-memory-server';
+import { Logger, INestApplication } from '@nestjs/common';
 
+import { delay } from './utils';
 import { AppModule } from '../src/app.module';
 import { CreateUserDto } from '../src/shared/dtos/users/create-user.dto';
 
@@ -32,6 +33,12 @@ describe('UsersController (e2e)', () => {
     mongoClient = new MongoClient(uri);
     await mongoClient.connect();
     db = mongoClient.db('users-app');
+
+    jest.spyOn(Logger.prototype, 'log').mockImplementation(() => {});
+    jest.spyOn(Logger.prototype, 'error').mockImplementation(() => {});
+    jest.spyOn(Logger.prototype, 'warn').mockImplementation(() => {});
+    jest.spyOn(Logger.prototype, 'debug').mockImplementation(() => {});
+    jest.spyOn(Logger.prototype, 'verbose').mockImplementation(() => {});
   });
 
   afterAll(async () => {
@@ -63,9 +70,8 @@ describe('UsersController (e2e)', () => {
     });
 
     expect(response.body).not.toHaveProperty('password');
-    await new Promise((resolve) => {
-      setTimeout(() => resolve(undefined), 500);
-    });
+
+    await delay(500);
 
     const users = await db.collection('users').find().toArray();
     expect(users.length).toBe(1);
@@ -97,5 +103,39 @@ describe('UsersController (e2e)', () => {
       request(app.getHttpServer()).post('/users').send(bodyWithoutLastName).expect(400),
       request(app.getHttpServer()).post('/users').send(bodyWithMinPasswordLength).expect(400),
     ]);
+  });
+
+  it('/users/:uuid (DELETE) - should delete a user successfully', async () => {
+    const createUserBody = {
+      firstName: 'Test',
+      lastName: 'User',
+      email: 'testuser@g.com',
+      password: '123456',
+    };
+
+    // prettier-ignore
+    const createResponse = await request(app.getHttpServer())
+      .post('/users')
+      .send(createUserBody)
+      .expect(201);
+
+    const userUuid = createResponse.body.uuid;
+
+    // prettier-ignore
+    const deleteResponse = await request(app.getHttpServer())
+      .delete(`/users/${userUuid}`)
+      .expect(200);
+    expect(deleteResponse.body).toMatchObject({
+      deleted: true,
+    });
+
+    await delay(200);
+    const users = await db.collection('users').find().toArray();
+    expect(users.length).toBe(0);
+  });
+
+  it('/users/:uuid (DELETE) - should fail to delete a non-existent user', async () => {
+    const nonExistentUuid = 'non-existent-uuid';
+    await request(app.getHttpServer()).delete(`/users/${nonExistentUuid}`).expect(404);
   });
 });

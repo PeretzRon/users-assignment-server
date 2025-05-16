@@ -25,4 +25,9 @@ export class UsersRepository {
     await this.collection.insertOne({ ...newUser });
     return newUser;
   }
+
+  async delete(uuid: string): Promise<boolean> {
+    const result = await this.collection.deleteOne({ uuid });
+    return result.deletedCount === 1;
+  }
 }

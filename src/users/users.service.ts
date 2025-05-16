@@ -1,5 +1,5 @@
 import * as bcrypt from 'bcrypt';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { UsersRepository } from './users.repository';
 import { CreateUserDto } from '../shared/dtos/users/create-user.dto';
@@ -21,5 +21,13 @@ export class UsersService {
     });
     delete newUser.password;
     return newUser;
+  }
+
+  async delete(uuid: string): Promise<boolean> {
+    const isUserDeleted = await this.repo.delete(uuid);
+    if (!isUserDeleted) {
+      throw new NotFoundException('User not found');
+    }
+    return true;
   }
 }
