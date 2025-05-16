@@ -30,6 +30,8 @@ module.exports = {
   },
   ignorePatterns: ['.eslintrc.js'],
   rules: {
+    'implicit-arrow-linebreak': 'off',
+    'max-len': ['error', { code: 120 }],
     indent: ['error', 2, { ignoredNodes: ['PropertyDefinition'] }],
     'no-underscore-dangle': ['error', { allow: ['_id'] }],
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],

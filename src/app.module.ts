@@ -3,6 +3,8 @@ import { ConfigModule } from '@nestjs/config';
 
 import config from './config';
 import { UsersModule } from './users/users.module';
+import { QueueModule } from './queue/queue.module';
+import { RetryService } from './retry/retry.service';
 import { HealthModule } from './health/health.module';
 
 @Module({
@@ -14,9 +16,10 @@ import { HealthModule } from './health/health.module';
     }),
     HealthModule,
     UsersModule,
+    QueueModule,
   ],
   controllers: [],
-  providers: [],
-  exports: [],
+  providers: [RetryService],
+  exports: [RetryService],
 })
 export class AppModule {}

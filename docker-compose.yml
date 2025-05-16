@@ -9,5 +9,22 @@ services:
     volumes:
       - ./docker-scripts/init-mongo-db-with-collections.js:/docker-entrypoint-initdb.d/init-mongo-db-with-collections.js:ro
 
+  redis:
+    image: redis:latest
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+
+  redis-insight:
+    image: redis/redisinsight:latest
+    restart: always
+    ports:
+      - "5540:5540"
+    volumes:
+      - redis-insight:/data
+
 volumes:
   mongodb_data:
+  redis-insight:
+  redis_data:
