@@ -1,4 +1,4 @@
-# Users App Serve
+# Users App Server
 
 ## 🚀 Getting Started
 
