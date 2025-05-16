@@ -17,23 +17,21 @@ export class RetryService {
     customRetries?: number,
     customDelayMs?: number,
     onMaxAttempts?: (error: unknown) => void | Promise<void>,
-    timeoutMs = 1000,
   ): Promise<T> {
     const retries = customRetries ?? this.configService.get<number>('RETRY_COUNT')!;
     const delayMs = customDelayMs ?? this.configService.get<number>('RETRY_DELAY_MS')!;
-    return this.tryWithRetry(fn, retries, delayMs, timeoutMs, 1, onMaxAttempts);
+    return this.tryWithRetry(fn, retries, delayMs, 1, onMaxAttempts);
   }
 
   private async tryWithRetry<T>(
     fn: () => Promise<T>,
     maxRetries: number,
     delayMs: number,
-    timeoutMs: number,
     attempt: number,
     onMaxAttempts?: (error: unknown) => void | Promise<void>,
   ): Promise<T> {
     try {
-      return await Promise.race([fn(), this.timeoutPromise(timeoutMs)]);
+      return await fn();
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       this.logger.warn(`Attempt ${attempt}/${maxRetries} failed: ${message}`);
@@ -49,7 +47,7 @@ export class RetryService {
       }
 
       await this.delay(delayMs);
-      return this.tryWithRetry(fn, maxRetries, delayMs, timeoutMs, attempt + 1, onMaxAttempts);
+      return this.tryWithRetry(fn, maxRetries, delayMs, attempt + 1, onMaxAttempts);
     }
   }
 

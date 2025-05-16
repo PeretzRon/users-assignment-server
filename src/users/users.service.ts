@@ -9,7 +9,7 @@ import { UserResponseDto } from '../shared/dtos/users/user-response.dto';
 
 @Injectable()
 export class UsersService {
-  private readonly RETRIES = 3;
+  private readonly RETRIES = 10;
 
   private readonly DELAY_MS = 500;
 
@@ -48,14 +48,8 @@ export class UsersService {
   }
 
   async delete(uuid: string): Promise<boolean> {
-    return this.retryService.retry(
-      async () => {
-        const deleted = await this.repo.delete(uuid);
-        if (!deleted) {
-          throw new NotFoundException('User not found');
-        }
-        return deleted;
-      },
+    const isDeleted = await this.retryService.retry(
+      async () => this.repo.delete(uuid),
       this.RETRIES,
       this.DELAY_MS,
       async (error) => {
@@ -65,5 +59,10 @@ export class UsersService {
         });
       },
     );
+    if (!isDeleted) {
+      throw new NotFoundException('User not found');
+    }
+
+    return isDeleted;
   }
 }

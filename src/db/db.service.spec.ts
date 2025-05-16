@@ -12,14 +12,14 @@ jest.mock('mongodb', () => ({
 
 describe('DbService', () => {
   let service: DbService;
-  let mockConfigService: Partial<ConfigService>;
+  let mockConfigService: jest.Mocked<ConfigService>;
   let mockMongoClient: Partial<MongoClient>;
   let mockDb: Partial<Db>;
 
   beforeEach(async () => {
     mockConfigService = {
       get: jest.fn().mockReturnValue('mongodb://localhost:27017'),
-    };
+    } as unknown as jest.Mocked<ConfigService>;
 
     mockDb = {};
     mockMongoClient = {
@@ -53,7 +53,15 @@ describe('DbService', () => {
   it('should connect to MongoDB on module init', async () => {
     await service.onModuleInit();
 
-    expect(MongoClient.connect).toHaveBeenCalledWith('mongodb://localhost:27017');
+    expect(MongoClient.connect).toHaveBeenCalledWith(
+      'mongodb://localhost:27017',
+      expect.objectContaining({
+        connectTimeoutMS: mockConfigService.get('MONGO_CONNECT_TIMEOUT_MS'),
+        serverSelectionTimeoutMS: mockConfigService.get('MONGO_SERVER_SELECTION_TIMEOUT_MS'),
+        socketTimeoutMS: mockConfigService.get('MONGO_SOCKET_TIMEOUT_MS'),
+      }),
+    );
+
     expect(mockMongoClient.db).toHaveBeenCalledWith('users-app');
     expect(service.getDatabase()).toBe(mockDb);
   });

@@ -69,18 +69,6 @@ describe('RetryService', () => {
     expect(fn).toHaveBeenCalledTimes(2);
   });
 
-  it('should timeout if the function takes too long', async () => {
-    const fn = jest.fn().mockImplementation(
-      () =>
-        new Promise((resolve) => {
-          setTimeout(() => resolve('late'), 200);
-        }),
-    );
-
-    await expect(retryService.retry(fn, 1, 10, undefined, 50)).rejects.toThrow('Operation timed out');
-    expect(fn).toHaveBeenCalledTimes(1);
-  });
-
   it('should call onMaxAttempts if all retries fail', async () => {
     const fn = jest.fn().mockRejectedValue(new Error('boom'));
     const onMax = jest.fn();
