@@ -28,12 +28,12 @@ export class UsersController {
   constructor(private readonly service: UsersService) {}
 
   @Get()
-  async getAll(): Promise<UserResponseDto[]> {
+  async getAll(): Promise<{ users: UserResponseDto[] }> {
     this.logger.log('Fetching all users');
     try {
       const users = await this.service.getAll();
       this.logger.log('users fetched successfully');
-      return users;
+      return { users };
     } catch (error) {
       this.logger.error('Error fetching users', error.stack);
       throw new HttpException('Failed to fetch users', HttpStatus.INTERNAL_SERVER_ERROR);
