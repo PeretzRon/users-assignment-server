@@ -1,5 +1,6 @@
 import { HealthCheck } from '@nestjs/terminus';
 import { Controller, Get } from '@nestjs/common';
+import { ApiExcludeEndpoint } from '@nestjs/swagger';
 
 import { MongoHealthIndicator } from './mongo.health';
 import { Routes } from '../shared/constants/routes.const';
@@ -8,6 +9,7 @@ import { Routes } from '../shared/constants/routes.const';
 export class HealthController {
   constructor(private mongoIndicator: MongoHealthIndicator) {}
 
+  @ApiExcludeEndpoint()
   @Get(Routes.HEALTH)
   @HealthCheck()
   async check() {

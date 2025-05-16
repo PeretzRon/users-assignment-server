@@ -1,3 +1,4 @@
+import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam } from '@nestjs/swagger';
 import {
   Body,
   Controller,
@@ -18,6 +19,7 @@ import { CreateUserDto } from '../shared/dtos/users/create-user.dto';
 import { DeleteUserDto } from '../shared/dtos/users/delete-user.dto';
 import { UserResponseDto } from '../shared/dtos/users/user-response.dto';
 
+@ApiTags('Users')
 @Controller({
   version: '1',
   path: Routes.USERS,
@@ -28,6 +30,17 @@ export class UsersController {
   constructor(private readonly service: UsersService) {}
 
   @Get()
+  @ApiOperation({ summary: 'Fetch all users' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of all users',
+    type: UserResponseDto,
+    isArray: true,
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Failed to fetch users',
+  })
   async getAll(): Promise<{ users: UserResponseDto[] }> {
     this.logger.log('Fetching all users');
     try {
@@ -42,7 +55,18 @@ export class UsersController {
 
   @Post()
   @UsePipes(new ValidationPipe())
-  async create(@Body() body: CreateUserDto) {
+  @ApiOperation({ summary: 'Create a new user' })
+  @ApiBody({ type: CreateUserDto })
+  @ApiResponse({
+    status: 201,
+    type: UserResponseDto,
+    description: 'User created successfully',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Failed to create user',
+  })
+  async create(@Body() body: CreateUserDto): Promise<UserResponseDto> {
     this.logger.log(`Creating a new user: ${JSON.stringify((({ password: _password, ...rest }) => rest)(body))}`);
     try {
       const result = await this.service.create(body);
@@ -56,6 +80,23 @@ export class UsersController {
 
   @Delete(':uuid')
   @UsePipes(new ValidationPipe())
+  @ApiOperation({ summary: 'Delete a user by UUID' })
+  @ApiParam({
+    name: 'uuid',
+    description: 'UUID of the user to delete',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'User deleted successfully',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'User not found',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Failed to delete user',
+  })
   async delete(@Param() params: DeleteUserDto) {
     this.logger.log(`Start deleting user with id: ${params.uuid}`);
     try {
