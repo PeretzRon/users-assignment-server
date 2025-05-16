@@ -1,12 +1,16 @@
+import Redis from 'ioredis-mock';
 import * as request from 'supertest';
 import { Db, MongoClient } from 'mongodb';
 import { Test, TestingModule } from '@nestjs/testing';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { Logger, INestApplication } from '@nestjs/common';
+import { INestApplication, Logger } from '@nestjs/common';
 
 import { delay } from './utils';
 import { AppModule } from '../src/app.module';
+import { QueueModule } from '../src/queue/queue.module';
 import { CreateUserDto } from '../src/shared/dtos/users/create-user.dto';
+
+jest.mock('ioredis', () => Redis);
 
 describe('UsersController (e2e)', () => {
   let app: INestApplication;
@@ -25,7 +29,12 @@ describe('UsersController (e2e)', () => {
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
-    }).compile();
+    })
+      .overrideProvider(QueueModule)
+      .useValue({
+        enqueueFailedJob: jest.fn(),
+      })
+      .compile();
 
     app = moduleFixture.createNestApplication();
     await app.init();
@@ -33,8 +42,8 @@ describe('UsersController (e2e)', () => {
     mongoClient = new MongoClient(uri);
     await mongoClient.connect();
     db = mongoClient.db('users-app');
-    db.createCollection('users');
-    db.collection('users').createIndex({ email: 1 }, { unique: true });
+    await db.createCollection('users');
+    await db.collection('users').createIndex({ email: 1 }, { unique: true });
 
     jest.spyOn(Logger.prototype, 'log').mockImplementation(() => {});
     jest.spyOn(Logger.prototype, 'error').mockImplementation(() => {});

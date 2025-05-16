@@ -8,4 +8,6 @@ export default () => ({
   MONGO_SERVER_SELECTION_TIMEOUT_MS: get('MONGO_SERVER_SELECTION_TIMEOUT_MS').default(1000).asIntPositive(),
   MONGO_SOCKET_TIMEOUT_MS: get('MONGO_SOCKET_TIMEOUT_MS').default(1000).asIntPositive(),
   MONGO_CONNECT_TIMEOUT_MS: get('MONGO_CONNECT_TIMEOUT_MS').default(1000).asIntPositive(),
+  REDIS_HOST: get('REDIS_HOST').default('localhost').asString(),
+  REDIS_PORT: get('REDIS_PORT').default(6379).asPortNumber(),
 });
